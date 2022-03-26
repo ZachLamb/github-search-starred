@@ -5,8 +5,39 @@ import styles from "../styles/Home.module.css";
 
 import ClientOnly from "../components/ClientOnly";
 import ReposList from "../components/ReposList";
+import { Autocomplete,Button,TextField } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
+import { useRef, useState } from "react";
+import { useLazyQuery,gql } from "@apollo/client";
+
+const FINDREPOS = gql`
+  query FindRepos($user_name: String!) {
+    search(query: $user_name, type: REPOSITORY, first: 10) {
+      edges {
+        node {
+          ... on Repository {
+            name
+            stargazerCount
+            url
+            id
+          }
+        }
+      }
+    }
+  }
+`;
 
 export default function Home() {
+
+  const [options, setOptions] = useState([])
+  const [value, setValue] = useState(null);
+  const [inputValue, setInputValue] = useState('');
+  const loaded = useRef(false);
+
+  const [getGithubRepos , {loading,data, error}] = useLazyQuery(FINDREPOS, {
+      variables: {"user_name": inputValue }
+  });
+
   return (
     <div className={styles.container}>
       <Head>
@@ -20,19 +51,32 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>Search for Starred Github Projects</h1>
-        {/* TODO: Convert this to Material UI Autocomplete search bar */}
-        <form id="form" role="search">
-          <input
-            type="search"
-            id="query"
-            name="github-search"
-            placeholder="Search Starred Repos..."
-            aria-label="Search through Github Starred Repositories"
-          />
-          <button>Search</button>
-        </form>
 
-        <ReposList userName="org:Facebook"></ReposList>
+        <Autocomplete 
+          id="search-github-user"
+          options={options}
+          autoComplete
+          includeInputInList
+          fullWidth
+          value={value}
+          onChange={(event, newValue) => {
+            setOptions(newValue ? [newValue, ...options] : options);
+            setValue(newValue);
+          }}
+          onInputChange={(event, newInputValue) => {
+            const orgInput = `org:${newInputValue}`;
+            setInputValue(orgInput);
+          }}
+          renderInput={(params) => (
+          <TextField {...params} label="Search for a user" fullWidth />
+          )}
+          filterOptions={(x) => x}
+        ></Autocomplete>
+        <Button variant="outlined" endIcon={<SearchIcon />} onClick={() => getGithubRepos()}>
+          Search
+        </Button>
+
+        <ReposList userName={inputValue}></ReposList>
 
         
       </main>
