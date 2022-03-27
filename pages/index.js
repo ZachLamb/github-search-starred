@@ -5,10 +5,10 @@ import styles from "../styles/Home.module.css";
 
 import ClientOnly from "../components/ClientOnly";
 import ReposList from "../components/ReposList";
-import { Autocomplete,Button,TextField } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
+import { Autocomplete, Button, Container, TextField } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { useRef, useState } from "react";
-import { useLazyQuery,gql } from "@apollo/client";
+import { useLazyQuery, gql } from "@apollo/client";
 
 const FINDREPOS = gql`
   query FindRepos($user_name: String!) {
@@ -28,14 +28,18 @@ const FINDREPOS = gql`
 `;
 
 export default function Home() {
-
-  const [options, setOptions] = useState([])
+  const [options, setOptions] = useState([]);
   const [value, setValue] = useState(null);
-  const [inputValue, setInputValue] = useState('');
-  const loaded = useRef(false);
+  const [inputValue, setInputValue] = useState("");
+  const [repoData, setRepoData] = useState({});
+  // const loaded = useRef(false);
+  const [loaded, setLoaded] = useState(false);
 
-  const [getGithubRepos , {loading,data, error}] = useLazyQuery(FINDREPOS, {
-      variables: {"user_name": inputValue }
+  const [getGithubRepos, { loading, data, error }] = useLazyQuery(FINDREPOS, {
+    onCompleted: (repos) => {
+      setRepoData(repos);
+      setLoaded(true);
+    },
   });
 
   return (
@@ -51,34 +55,50 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>Search for Starred Github Projects</h1>
-
-        <Autocomplete 
-          id="search-github-user"
-          options={options}
-          autoComplete
-          includeInputInList
-          fullWidth
-          value={value}
-          onChange={(event, newValue) => {
-            setOptions(newValue ? [newValue, ...options] : options);
-            setValue(newValue);
-          }}
-          onInputChange={(event, newInputValue) => {
-            const orgInput = `org:${newInputValue}`;
-            setInputValue(orgInput);
-          }}
-          renderInput={(params) => (
-          <TextField {...params} label="Search for a user" fullWidth />
-          )}
-          filterOptions={(x) => x}
-        ></Autocomplete>
-        <Button variant="outlined" endIcon={<SearchIcon />} onClick={() => getGithubRepos()}>
-          Search
-        </Button>
-
-        <ReposList userName={inputValue}></ReposList>
-
-        
+        <Container
+        sx={{ 
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}
+        maxWidth='md'
+        >
+          <Autocomplete
+            id="search-github-user"
+            sx={{
+              width: '80%'
+            }}
+            freeSolo
+            options={options}
+            autoComplete
+            includeInputInList
+            size={'small'}
+            value={value}
+            onChange={(event, newValue) => {
+              setOptions(newValue ? [newValue, ...options] : options);
+              setValue(newValue);
+            }}
+            onInputChange={(event, newInputValue) => {
+              const orgInput = `org:${newInputValue}`;
+              setInputValue(orgInput);
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Search for a user" fullWidth />
+            )}
+            filterOptions={(x) => x}
+          ></Autocomplete>
+          <Button
+            variant="outlined"
+            endIcon={<SearchIcon />}
+            onClick={() =>
+              getGithubRepos({
+                variables: { user_name: inputValue },
+              })
+            }
+          >
+            Search
+          </Button>
+        </Container>
+        <ReposList repoData={repoData} loaded={loaded}></ReposList>
       </main>
 
       <footer className={styles.footer}>
