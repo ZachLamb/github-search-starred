@@ -1,46 +1,32 @@
 // import GitHubIcon from '@mui/icons-material/GitHub';
 import Head from "next/head";
 import Image from "next/image";
-import styles from "../styles/Home.module.css";
 
-import ClientOnly from "../components/ClientOnly";
-import ReposList from "../components/ReposList";
-import { Autocomplete, Button, Container, TextField } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import { useRef, useState } from "react";
 import { useLazyQuery, gql } from "@apollo/client";
 
-const FINDREPOS = gql`
-  query FindRepos($user_name: String!) {
-    search(query: $user_name, type: REPOSITORY, first: 10) {
-      edges {
-        node {
-          ... on Repository {
-            name
-            stargazerCount
-            url
-            id
-          }
-        }
-      }
-    }
-  }
-`;
+import ClientOnly from "../components/ClientOnly";
+import ReposList from "../components/ReposList";
+import Pagination from "../components/Pagination";
+import SearchBar from "../components/SearchBar";
+
+import { Button } from "@mui/material";
+import { ArrowBack, ArrowForward } from "@mui/icons-material";
+
+import styles from "../styles/Home.module.css";
 
 export default function Home() {
   const [options, setOptions] = useState([]);
   const [value, setValue] = useState(null);
   const [inputValue, setInputValue] = useState("");
+  const [page, setPage] = useState(1);
   const [repoData, setRepoData] = useState({});
-  // const loaded = useRef(false);
   const [loaded, setLoaded] = useState(false);
-
-  const [getGithubRepos, { loading, data, error }] = useLazyQuery(FINDREPOS, {
-    onCompleted: (repos) => {
-      setRepoData(repos);
-      setLoaded(true);
-    },
-  });
+  const [prevPage, setPrevPage] = useState("");
+  const [nextPage, setNextPage] = useState("");
+  const [hasPrevPage, setHasPrevPage] = useState(true);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const [pageCount, setPageCount] = useState(1);
 
   return (
     <div className={styles.container}>
@@ -55,50 +41,36 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>Search for Starred Github Projects</h1>
-        <Container
-        sx={{ 
-          display: 'flex',
-          justifyContent: 'space-between'
-        }}
-        maxWidth='md'
-        >
-          <Autocomplete
-            id="search-github-user"
-            sx={{
-              width: '80%'
-            }}
-            freeSolo
-            options={options}
-            autoComplete
-            includeInputInList
-            size={'small'}
-            value={value}
-            onChange={(event, newValue) => {
-              setOptions(newValue ? [newValue, ...options] : options);
-              setValue(newValue);
-            }}
-            onInputChange={(event, newInputValue) => {
-              const orgInput = `org:${newInputValue}`;
-              setInputValue(orgInput);
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Search for a user" fullWidth />
-            )}
-            filterOptions={(x) => x}
-          ></Autocomplete>
-          <Button
-            variant="outlined"
-            endIcon={<SearchIcon />}
-            onClick={() =>
-              getGithubRepos({
-                variables: { user_name: inputValue },
-              })
-            }
-          >
-            Search
-          </Button>
-        </Container>
+        <SearchBar
+          setRepoData={setRepoData}
+          setHasPrevPage={setHasPrevPage}
+          setHasNextPage={setHasNextPage}
+          setPrevPage={setPrevPage}
+          setNextPage={setNextPage}
+          setLoaded={setLoaded}
+          options={options}
+          setOptions={setOptions}
+          value={value}
+          setValue={setValue}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+        ></SearchBar>
         <ReposList repoData={repoData} loaded={loaded}></ReposList>
+        <Pagination
+          pageCount={pageCount}
+          setPageCount={setPageCount}
+          nextPage={nextPage}
+          prevPage={prevPage}
+          setRepoData={setRepoData}
+          setHasPrevPage={setHasPrevPage}
+          setHasNextPage={setHasNextPage}
+          setPrevPage={setPrevPage}
+          setNextPage={setNextPage}
+          setLoaded={setLoaded}
+          hasPrevPage={hasPrevPage}
+          hasNextPage={hasNextPage}
+          inputValue={inputValue}
+        ></Pagination>
       </main>
 
       <footer className={styles.footer}>
