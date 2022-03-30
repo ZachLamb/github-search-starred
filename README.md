@@ -1,8 +1,19 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## Getting Started with Zach's Submission
 
-First, run the development server:
+Please install all necessary packages first
+
+```bash
+npm install
+```
+
+Next add a .env.local file with your Github secret that allows you to make network calls locally.
+
+
+If you need help creating the Github token, [see this document ](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). If you are having issues, please also see [this NextJS documentation](https://nextjs.org/docs/basic-features/environment-variables) on local envs. Of course, you are always welcome to reach out to me directly if you are having any issues (Leigh can connect you with me.).
+
+Second, run the development server:
 
 ```bash
 npm run dev
