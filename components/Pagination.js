@@ -6,6 +6,9 @@ import { useLazyQuery, gql } from "@apollo/client";
 
 import styles from "../styles/Home.module.css";
 
+
+// TODO configure pagination component to handle numbered pages
+// TODO fix bug with binding event in buttons
 const NEXTREPOS = gql`
   query FindRepos($user_name: String!, $after_node: String!) {
     search(query: $user_name, type: REPOSITORY, first: 10, after: $after_node) {
@@ -88,10 +91,12 @@ export default function Pagination(props) {
         props.setHasNextPage(!repos.search.pageInfo.hasNextPage);
         props.setPrevPage(repos.search.pageInfo.startCursor);
         props.setNextPage(repos.search.pageInfo.endCursor);
+        // TODO: handle loading states better
         props.setLoaded(true);
       },
     }
   );
+//   TODO: convert styling to not be inline
   return (
     <Container
       sx={{
@@ -108,7 +113,7 @@ export default function Pagination(props) {
             getPrevGithubRepos({
               variables: { 
                   user_name: props.inputValue,
-                  before_node: props.prevPage
+                  before_node: props.nextPage
               },
             })
           }

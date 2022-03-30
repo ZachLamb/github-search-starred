@@ -1,0 +1,8 @@
+.searchContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+#search-github-user {
+  width: 80%;
+}

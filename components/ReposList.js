@@ -1,3 +1,4 @@
+import { Star } from "@mui/icons-material";
 import { Icon, List, ListItem, ListItemButton } from "@mui/material";
 import styles from "../styles/Home.module.css";
 
@@ -16,7 +17,8 @@ export default function ReposList(repoData,loaded,error) {
           return (
             <ListItem key={repo.id + " " + i}>
               <ListItemButton component="a" href={repo.url} target="_blank">
-                <Icon></Icon>{repo.name}
+                <h3>{repo.name}</h3>
+                <Star></Star>{repo.stargazerCount}
               </ListItemButton>
             </ListItem>
           );

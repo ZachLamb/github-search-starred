@@ -41,12 +41,14 @@ export default function SearchBar(props) {
 
   return (
     <Container
+    // TODO: put this in a CSS file
       sx={{
         display: "flex",
         justifyContent: "space-between",
       }}
       maxWidth="md"
     >
+      {/* TODO: add in network call to do autocomplete for user by adding in data to options object */}
       <Autocomplete
         id="search-github-user"
         sx={{
@@ -59,10 +61,11 @@ export default function SearchBar(props) {
         size={"small"}
         value={props.value}
         onChange={(event, newValue) => {
-          props.setOptions(newValue ? [newValue, ...options] : options);
+          // props.setOptions(newValue ? [newValue, ...options] : options);
           props.setValue(newValue);
         }}
         onInputChange={(event, newInputValue) => {
+          // TODO convert this to toggle for user to choose between searching for orgs and individuals
           const orgInput = `org:${newInputValue}`;
           props.setInputValue(orgInput);
         }}
