@@ -18,8 +18,20 @@ Second, run the development server:
 ```bash
 npm run dev
 # or
-yarn dev
+yarn
+ dev
 ```
+
+Things I would have added in or done differently:
+
+* Used REST API instead of GraphQL
+* Made UI sharper by changing title to a logo and converting result list into cards with descriptions of repos
+* Added toggle to allow user to switch between searching for orgs and individual accounts 
+* Deployed to AWS using Serverless
+* Added SSO using NextAuth
+* Added autocomplete feature ,so that user sees potential list of searches that they could make
+* Added end-to-end testing using Cypress (this would allow me to simulate user clicks and unit testing)
+* Change current pagination feature to used numbered pages (requires more logic with Github GraphQL calls)
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
